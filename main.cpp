@@ -173,4 +173,27 @@ void viewCartAndCheckout() {
         subtotal += lineTotal;
         cout << " - " << item.quantity << "x " << left << setw(32) << item.product.name
              << ": RM " << right << setw(7) << lineTotal << endl;
-    }}
+    }
+
+    cout << "--------------------------------------------------" << endl;
+    cout << "Current Subtotal                  : RM " << right << setw(7) << subtotal << endl;
+    cout << "--------------------------------------------------" << endl;
+
+    // Promo code entry
+    string promoCode;
+    double voucherDiscount = 0.0;
+    cout << "\nEnter Promo Code (e.g., SHOPEE10, FREESHIP, or NONE): ";
+    cin >> promoCode;
+
+    if (promoCode == "SHOPEE10") {
+        voucherDiscount = subtotal * 0.10;
+        cout << ">> Voucher Applied: 10% Discount (-RM " << voucherDiscount << ")" << endl;
+    } else if (promoCode == "FREESHIP") {
+        cout << ">> Voucher Applied: Free Shipping Voucher Activated." << endl;
+    } else if (promoCode == "NONE" || promoCode == "none") {
+        cout << ">> No promo code applied." << endl;
+    } else {
+        cout << "[NOTICE] Invalid voucher code. Proceeding with RM 0.00 discount." << endl;
+        promoCode = "INVALID";
+    }
+}
