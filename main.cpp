@@ -20,6 +20,15 @@ struct CartItem {
     int quantity;
 };
 
+// Customer active cart
+vector<CartItem> cart;
+
+// Function declarations
+void displayCategoryCatalog(const string& categoryName);
+void handleShopping(const string& categoryName);
+void viewCartAndCheckout();
+int findProductIndexById(int id);
+
 int main() {
     int mainChoice = 0;
     cout << fixed << setprecision(2);
@@ -49,15 +58,19 @@ int main() {
 
         switch (mainChoice) {
             case 1:
+                handleShopping("Electronics & Gadgets");
+                break;
             case 2:
+                handleShopping("Fashion & Apparel");
+                break;
             case 3:
-                cout << ">> Category selected. (Catalog coming soon)" << endl;
+                handleShopping("Groceries & Essentials");
                 break;
             case 4:
-                cout << ">> Cart is currently under development." << endl;
+                viewCartAndCheckout();
                 break;
             case 5:
-                cout << "\nThank you for visiting Shopee" << endl;
+                cout << "\nThank you for visiting Shopee CLI Store. Goodbye!" << endl;
                 break;
             default:
                 cout << "[ERROR] Invalid option. Please choose between 1 and 5." << endl;
@@ -66,6 +79,7 @@ int main() {
     }
     return 0;
 }
+
 Product products[] = {
     {101, "Wireless Bluetooth Earbuds", 45.00, 15, "Electronics & Gadgets"},
     {102, "Fast Charging USB-C Cable", 8.00, 50, "Electronics & Gadgets"},
