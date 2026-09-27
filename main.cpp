@@ -234,7 +234,7 @@ void viewCartAndCheckout() {
     double voucherDiscount = 0.0;
     cout << "\nEnter Promo Code (e.g., SHOPEE10, FREESHIP, or NONE): ";
     cin >> promoCode;
-
+    transform(promoCode.begin(), promoCode.end(), promoCode.begin(), ::toupper);    
     if (promoCode == "SHOPEE10") {
         voucherDiscount = subtotal * 0.10;
         cout << ">> Voucher Applied: 10% Discount (-RM " << voucherDiscount << ")" << endl;
