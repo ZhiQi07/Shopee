@@ -80,27 +80,33 @@ int main() {
     return 0;
 }
 
-Product products[] = {
-    {101, "Wireless Bluetooth Earbuds", 45.00, 15, "Electronics & Gadgets"},
-    {102, "Fast Charging USB-C Cable", 8.00, 50, "Electronics & Gadgets"},
-    {103, "10000mAh Powerbank", 35.00, 20, "Electronics & Gadgets"},
-    {104, "Strong wind 100 Gear High Speed Handheld Fan With Led Display", 53.35, 121, "Electronics & Gadgets"},
-    {105, "Foldable Headphones HiFi Stereo Sound Bluetooth Long Battery Life Multi-mode Playback", 33.00, 38, "Electronics & Gadgets"},
-    {201, "Oversized Cotton T-Shirt", 25.00, 40, "Fashion & Apparel"},
-    {202, "Denim Jacket", 68.00, 10, "Fashion & Apparel"},
-    {203, "Canvas Sneakers", 55.00, 15, "Fashion & Apparel"},
-    {204, "Women Yoga Pants Fitness Pants Legging", 13.99, 225, "Fashion & Apparel"},
-    {205, "Cool Feeling Comfortable Short Sleeve T-Shirt Men", 29.99, 103, "Fashion & Apparel"},
-    {301, "Ayam Brand Sardeines in Tomato Sauce 155g", 5.70, 50, "Groceries & Essentials},
-    {302, "Siew Pak Choy 250g", 1.29, 5, "Groceries & Essentials},
-    {303, "Korean Original Luncheon Meat 340g", 8.16, 39, "Groceries & Essentials"},
-    {304, "Purple Sweet Potato", 3.60, 26, "Groceries & Essentials"},
-    {305, "Vietnam Cavendish Banana 1kg", 4.99, 14, "Groceries & Essentials"}
+vector<Product> inventory = {
+    // Electronics & Gadgets
+    {101, "Wireless Bluetooth Earbuds", "Electronics & Gadgets", 45.00, 15},
+    {102, "Fast Charging USB-C Cable", "Electronics & Gadgets", 8.00, 50},
+    {103, "10000mAh Powerbank", "Electronics & Gadgets", 35.00, 20},
+    {104, "High Speed Handheld Fan", "Electronics & Gadgets", 53.35, 121},
+    {105, "Foldable Bluetooth Headphones", "Electronics & Gadgets", 33.00, 38},
+
+    // Fashion & Apparel
+    {201, "Oversized Cotton T-Shirt", "Fashion & Apparel", 25.00, 40},
+    {202, "Denim Jacket", "Fashion & Apparel", 68.00, 10},
+    {203, "Canvas Sneakers", "Fashion & Apparel", 55.00, 15},
+    {204, "Women Fitness Leggings", "Fashion & Apparel", 13.99, 225},
+    {205, "Cool Short Sleeve T-Shirt", "Fashion & Apparel", 29.99, 103},
+
+    // Groceries & Essentials
+    {301, "Ayam Brand Sardines 155g", "Groceries & Essentials", 5.70, 50},
+    {302, "Siew Pak Choy 250g", "Groceries & Essentials", 1.29, 5},
+    {303, "Korean Luncheon Meat 340g", "Groceries & Essentials", 8.16, 39},
+    {304, "Purple Sweet Potato 1kg", "Groceries & Essentials", 3.60, 26},
+    {305, "Cavendish Banana 1kg", "Groceries & Essentials", 4.99, 14}
 };
 // 全局购物车数据
 CartItem cart[50];
 int cartSize = 0;
 double subtotal = 0.0;
+
 // 显示分类商品菜单
 void showCategoryMenu(string categoryTitle, int startId, int endId) {
     cout << "\n--------------------------------------------------" << endl;
