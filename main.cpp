@@ -5,7 +5,7 @@
 
 using namespace std;
 
-// Product blueprint
+// Product structure
 struct Product {
     int id;
     string name;
@@ -16,20 +16,21 @@ struct Product {
 
 // Cart item structure
 struct CartItem {
-    int productId;
+    Product product;
     int quantity;
 };
 
-// Customer active cart
-vector<CartItem> cart;
+// Global cart vector
+vector cart;
 
 // Function declarations
 void displayCategoryCatalog(const string& categoryName);
 void handleShopping(const string& categoryName);
-void viewCartAndCheckout();
+bool viewCartAndCheckout(); // 返回 bool，决定是否退出程序
 int findProductIndexById(int id);
 
-vector<Product> inventory = {
+// Inventory data
+vector inventory = {
     // Electronics & Gadgets
     {101, "Wireless Bluetooth Earbuds", "Electronics & Gadgets", 45.00, 15},
     {102, "Fast Charging USB-C Cable", "Electronics & Gadgets", 8.00, 50},
@@ -60,7 +61,7 @@ int main() {
     cout << "                   WELCOME TO SHOPEE              " << endl;
     cout << "==================================================" << endl;
 
-    while (mainChoice != 5) {
+    while (true) {
         cout << "\n--------------------------------------------------" << endl;
         cout << "                 MAIN CATEGORIES                  " << endl;
         cout << "--------------------------------------------------" << endl;
@@ -78,37 +79,33 @@ int main() {
             cin.ignore(1000, '\n');
             continue;
         }
-        cin.ignore(1000, '\n'); 
 
-        switch (mainChoice) {
-            case 1:
-                handleShopping("Electronics & Gadgets");
-                break;
-            case 2:
-                handleShopping("Fashion & Apparel");
-                break;
-            case 3:
-                handleShopping("Groceries & Essentials");
-                break;
-            case 4:
-                viewCartAndCheckout();
-                break;
-            case 5:
+        if (mainChoice == 1) {
+            handleShopping("Electronics & Gadgets");
+        } else if (mainChoice == 2) {
+            handleShopping("Fashion & Apparel");
+        } else if (mainChoice == 3) {
+            handleShopping("Groceries & Essentials");
+        } else if (mainChoice == 4) {
+            bool shouldExit = viewCartAndCheckout();
+            if (shouldExit) {
                 cout << "\nThank you for visiting Shopee CLI Store. Goodbye!" << endl;
-                break;
-            default:
-                cout << "[ERROR] Invalid option. Please choose between 1 and 5." << endl;
-                break;
+                break; // 退出主循环
+            }
+        } else if (mainChoice == 5) {
+            cout << "\nThank you for visiting Shopee CLI Store. Goodbye!" << endl;
+            break;
+        } else {
+            cout << "[ERROR] Invalid option. Please choose between 1 and 5." << endl;
         }
     }
     return 0;
 }
 
-
 int findProductIndexById(int id) {
     for (size_t i = 0; i < inventory.size(); ++i) {
         if (inventory[i].id == id) {
-            return static_cast<int>(i);
+            return static_cast(i);
         }
     }
     return -1;
@@ -194,23 +191,48 @@ void handleShopping(const string& categoryName) {
         if (!(cin >> subChoice)) {
             cin.clear();
             cin.ignore(1000, '\n');
-            break; // Exit back to main menu
+            break;
         }
-        cin.ignore(1000, '\n');
 
         if (subChoice != 2) {
-            break; // User picked [1] or an exit condition
+            break;
         }
     }
 }
 
-// Review cart, apply promo codes, choose payment method, and render invoice
-void viewCartAndCheckout() {
+// 修改点：返回 bool 类型，告知 main 函数是否需要直接 Exit
+bool viewCartAndCheckout() {
+    // 核心判定：如果购物车没东西
     if (cart.empty()) {
-        cout << "\n[NOTICE] Your cart is empty. Add products before checking out." << endl;
-        return;
+        cout << "\n==================================================" << endl;
+        cout << "[NOTICE] Your cart is empty. Add products before checking out." << endl;
+        cout << "==================================================" << endl;
+        
+        int emptyChoice = 0;
+        while (true) {
+            cout << "\nWhat would you like to do?" << endl;
+            cout << "1. Continue Shopping (Return to Main Menu)" << endl;
+            cout << "2. Exit Store" << endl;
+            cout << "Enter choice (1-2): ";
+
+            if (!(cin >> emptyChoice)) {
+                cout << "[ERROR] Invalid input. Please enter 1 or 2." << endl;
+                cin.clear();
+                cin.ignore(1000, '\n');
+                continue;
+            }
+
+            if (emptyChoice == 1) {
+                return false; // 不退出，返回 main 继续购物
+            } else if (emptyChoice == 2) {
+                return true;  // 标记需要 Exit 退出程序
+            } else {
+                cout << "[ERROR] Invalid option. Please select 1 or 2." << endl;
+            }
+        }
     }
 
+    // --- 购物车有东西时的结算逻辑 ---
     double subtotal = 0.0;
 
     cout << "\n==================================================" << endl;
@@ -229,12 +251,11 @@ void viewCartAndCheckout() {
     cout << "Current Subtotal                  : RM " << right << setw(7) << subtotal << endl;
     cout << "--------------------------------------------------" << endl;
 
-    // Promo code entry
     string promoCode;
     double voucherDiscount = 0.0;
     cout << "\nEnter Promo Code (e.g., SHOPEE10, FREESHIP, or NONE): ";
     cin >> promoCode;
-    transform(promoCode.begin(), promoCode.end(), promoCode.begin(), ::toupper);    
+
     if (promoCode == "SHOPEE10") {
         voucherDiscount = subtotal * 0.10;
         cout << ">> Voucher Applied: 10% Discount (-RM " << voucherDiscount << ")" << endl;
@@ -247,7 +268,6 @@ void viewCartAndCheckout() {
         promoCode = "INVALID";
     }
 
-// Shipping fee rule
     double shippingFee = 5.00;
     string shippingRemark = "Standard delivery";
 
@@ -256,7 +276,6 @@ void viewCartAndCheckout() {
         shippingRemark = (promoCode == "FREESHIP") ? "Voucher free shipping" : "Free shipping >= RM40";
     }
 
-    // Payment method selection
     int paymentChoice = 0;
     double paymentAdjustment = 0.0;
     string paymentMethodName = "";
@@ -287,7 +306,6 @@ void viewCartAndCheckout() {
         }
     }
 
-// Final total calculation
     double grandTotal = subtotal + shippingFee - voucherDiscount + paymentAdjustment;
     if (grandTotal < 0.0) {
         grandTotal = 0.0;
@@ -297,7 +315,6 @@ void viewCartAndCheckout() {
 
     cout << "\nProcessing order..." << endl;
 
-    // Final official invoice
     cout << "\n==================================================================" << endl;
     cout << "                     SHOPEE OFFICIAL INVOICE                      " << endl;
     cout << "==================================================================" << endl;
@@ -327,7 +344,6 @@ void viewCartAndCheckout() {
     cout << "==================================================================" << endl;
     cout << "Thank you for shopping with Shopee!" << endl;
 
-    // Reset cart and terminate session
     cart.clear();
-    exit(0);
+    return true; // 结账完成后退出
 }
