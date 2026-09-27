@@ -29,6 +29,29 @@ void handleShopping(const string& categoryName);
 void viewCartAndCheckout();
 int findProductIndexById(int id);
 
+vector<Product> inventory = {
+    // Electronics & Gadgets
+    {101, "Wireless Bluetooth Earbuds", "Electronics & Gadgets", 45.00, 15},
+    {102, "Fast Charging USB-C Cable", "Electronics & Gadgets", 8.00, 50},
+    {103, "10000mAh Powerbank", "Electronics & Gadgets", 35.00, 20},
+    {104, "High Speed Handheld Fan", "Electronics & Gadgets", 53.35, 121},
+    {105, "Foldable Bluetooth Headphones", "Electronics & Gadgets", 33.00, 38},
+
+    // Fashion & Apparel
+    {201, "Oversized Cotton T-Shirt", "Fashion & Apparel", 25.00, 40},
+    {202, "Denim Jacket", "Fashion & Apparel", 68.00, 10},
+    {203, "Canvas Sneakers", "Fashion & Apparel", 55.00, 15},
+    {204, "Women Fitness Leggings", "Fashion & Apparel", 13.99, 225},
+    {205, "Cool Short Sleeve T-Shirt", "Fashion & Apparel", 29.99, 103},
+
+    // Groceries & Essentials
+    {301, "Ayam Brand Sardines 155g", "Groceries & Essentials", 5.70, 50},
+    {302, "Siew Pak Choy 250g", "Groceries & Essentials", 1.29, 5},
+    {303, "Korean Luncheon Meat 340g", "Groceries & Essentials", 8.16, 39},
+    {304, "Purple Sweet Potato 1kg", "Groceries & Essentials", 3.60, 26},
+    {305, "Cavendish Banana 1kg", "Groceries & Essentials", 4.99, 14}
+};
+
 int main() {
     int mainChoice = 0;
     cout << fixed << setprecision(2);
@@ -55,6 +78,7 @@ int main() {
             cin.ignore(1000, '\n');
             continue;
         }
+        cin.ignore(1000, '\n'); 
 
         switch (mainChoice) {
             case 1:
@@ -80,28 +104,103 @@ int main() {
     return 0;
 }
 
-vector<Product> inventory = {
-    // Electronics & Gadgets
-    {101, "Wireless Bluetooth Earbuds", "Electronics & Gadgets", 45.00, 15},
-    {102, "Fast Charging USB-C Cable", "Electronics & Gadgets", 8.00, 50},
-    {103, "10000mAh Powerbank", "Electronics & Gadgets", 35.00, 20},
-    {104, "High Speed Handheld Fan", "Electronics & Gadgets", 53.35, 121},
-    {105, "Foldable Bluetooth Headphones", "Electronics & Gadgets", 33.00, 38},
 
-    // Fashion & Apparel
-    {201, "Oversized Cotton T-Shirt", "Fashion & Apparel", 25.00, 40},
-    {202, "Denim Jacket", "Fashion & Apparel", 68.00, 10},
-    {203, "Canvas Sneakers", "Fashion & Apparel", 55.00, 15},
-    {204, "Women Fitness Leggings", "Fashion & Apparel", 13.99, 225},
-    {205, "Cool Short Sleeve T-Shirt", "Fashion & Apparel", 29.99, 103},
+int findProductIndexById(int id) {
+    for (size_t i = 0; i < inventory.size(); ++i) {
+        if (inventory[i].id == id) {
+            return static_cast<int>(i);
+        }
+    }
+    return -1;
+}
 
-    // Groceries & Essentials
-    {301, "Ayam Brand Sardines 155g", "Groceries & Essentials", 5.70, 50},
-    {302, "Siew Pak Choy 250g", "Groceries & Essentials", 1.29, 5},
-    {303, "Korean Luncheon Meat 340g", "Groceries & Essentials", 8.16, 39},
-    {304, "Purple Sweet Potato 1kg", "Groceries & Essentials", 3.60, 26},
-    {305, "Cavendish Banana 1kg", "Groceries & Essentials", 4.99, 14}
-};
+void displayCategoryCatalog(const string& categoryName) {
+    cout << "\n------------------------------------------------------------------" << endl;
+    cout << "CATEGORY: " << categoryName << endl;
+    cout << "------------------------------------------------------------------" << endl;
+    cout << left << setw(7)  << "ID"
+         << setw(38) << "Item Name"
+         << setw(13) << "Price (RM)"
+         << setw(8)  << "Stock" << endl;
+
+    for (const auto& item : inventory) {
+        if (item.category == categoryName) {
+            cout << left << setw(7)  << item.id
+                 << setw(38) << item.name
+                 << right << setw(8)  << item.price
+                 << setw(10) << item.stock << endl;
+        }
+    }
+    cout << "------------------------------------------------------------------" << endl;
+}
+
+void handleShopping(const string& categoryName) {
+    int subChoice = 2;
+
+    while (subChoice == 2) {
+        displayCategoryCatalog(categoryName);
+
+        int itemId = 0, quantity = 0;
+        cout << "Enter Item ID to purchase: ";
+        if (!(cin >> itemId)) {
+            cout << "[ERROR] Invalid input. Item ID must be a number." << endl;
+            cin.clear();
+            cin.ignore(1000, '\n');
+            continue;
+        }
+
+        int index = findProductIndexById(itemId);
+        if (index == -1 || inventory[index].category != categoryName) {
+            cout << "[ERROR] Invalid Item ID! Please choose an item listed above." << endl;
+            continue;
+        }
+
+        cout << "Enter Quantity: ";
+        if (!(cin >> quantity)) {
+            cout << "[ERROR] Invalid input. Quantity must be a number." << endl;
+            cin.clear();
+            cin.ignore(1000, '\n');
+            continue;
+        }
+
+        if (quantity <= 0) {
+            cout << "[ERROR] Quantity must be at least 1 unit." << endl;
+            continue;
+        }
+
+        if (quantity > inventory[index].stock) {
+            cout << "[ERROR] Insufficient stock! Only " << inventory[index].stock << " units available." << endl;
+            continue;
+        }
+
+        inventory[index].stock -= quantity;
+
+        bool existsInCart = false;
+        for (auto& item : cart) {
+            if (item.product.id == itemId) {
+                item.quantity += quantity;
+                existsInCart = true;
+                break;
+            }
+        }
+
+        if (!existsInCart) {
+            cart.push_back({inventory[index], quantity});
+        }
+
+        cout << ">> Success: Added " << quantity << "x " << inventory[index].name << " to cart." << endl;
+
+        cout << "\nAction: [1] Return to Main Menu  [2] Shop More in " << categoryName << endl;
+        cout << "Enter choice (1-2): ";
+        if (!(cin >> subChoice)) {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            subChoice = 1;
+        } else {
+            cin.ignore(1000, '\n'); // <-- ADD THIS LINE to flush the buffer
+        }
+    }
+}
 
 // Review cart, apply promo codes, choose payment method, and render invoice
 void viewCartAndCheckout() {
