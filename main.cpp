@@ -135,9 +135,7 @@ void displayCategoryCatalog(const string& categoryName) {
 }
 
 void handleShopping(const string& categoryName) {
-    int subChoice = 2;
-
-    while (subChoice == 2) {
+    while (true) {
         displayCategoryCatalog(categoryName);
 
         int itemId = 0, quantity = 0;
@@ -192,12 +190,16 @@ void handleShopping(const string& categoryName) {
 
         cout << "\nAction: [1] Return to Main Menu  [2] Shop More in " << categoryName << endl;
         cout << "Enter choice (1-2): ";
+        int subChoice = 0;
         if (!(cin >> subChoice)) {
             cin.clear();
             cin.ignore(1000, '\n');
-            subChoice = 1;
-        } else {
-            cin.ignore(1000, '\n'); // <-- ADD THIS LINE to flush the buffer
+            break; // Exit back to main menu
+        }
+        cin.ignore(1000, '\n');
+
+        if (subChoice != 2) {
+            break; // User picked [1] or an exit condition
         }
     }
 }
