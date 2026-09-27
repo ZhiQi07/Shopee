@@ -108,4 +108,49 @@ void showCategoryMenu(string categoryTitle, int startId, int endId) {
     }
     cout << "--------------------------------------------------" << endl;
 }
-
+// 添加商品到购物车逻辑
+void handlePurchase(int startId, int endId, string categoryName, string shortCatName) {
+    int itemId, qty;
+    cout << "Enter Item ID to purchase: ";
+    cin >> itemId;
+    
+    int index = -1;
+    for (int i = 0; i < 6; i++) {
+        if (products[i].id == itemId) {
+            index = i;
+            break;
+        }
+    }
+    
+    if (index != -1 && products[index].id >= startId && products[index].id <= endId) {
+        cout << "Enter Quantity: ";
+        cin >> qty;
+        
+        if (qty > 0 && qty <= products[index].stock) {
+            cart[cartSize].category = products[index].category;
+            cart[cartSize].name = products[index].name;
+            cart[cartSize].price = products[index].price;
+            cart[cartSize].qty = qty;
+            cartSize++;
+            
+            subtotal += (products[index].price * qty);
+            products[index].stock -= qty;
+            
+            cout << ">> Success: Added " << qty << "x " << products[index].name << " to cart.\n";
+        } else {
+            cout << ">> Error: Invalid quantity or insufficient stock.\n";
+        }
+    } else {
+        cout << ">> Error: Invalid Item ID.\n";
+    }
+    
+    int actionChoice;
+    cout << "\nAction: [1] Return to Main Menu  [2] Shop More in " << shortCatName << endl;
+    cout << "Enter choice: ";
+    cin >> actionChoice;
+    
+    if (actionChoice == 2) {
+        showCategoryMenu(categoryName, startId, endId);
+        handlePurchase(startId, endId, categoryName, shortCatName);
+    }
+}
