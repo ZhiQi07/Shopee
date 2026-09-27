@@ -196,4 +196,88 @@ void viewCartAndCheckout() {
         cout << "[NOTICE] Invalid voucher code. Proceeding with RM 0.00 discount." << endl;
         promoCode = "INVALID";
     }
+
+// Shipping fee rule
+    double shippingFee = 5.00;
+    string shippingRemark = "Standard delivery";
+
+    if (subtotal >= 40.00 || promoCode == "FREESHIP") {
+        shippingFee = 0.00;
+        shippingRemark = (promoCode == "FREESHIP") ? "Voucher free shipping" : "Free shipping >= RM40";
+    }
+
+    // Payment method selection
+    int paymentChoice = 0;
+    double paymentAdjustment = 0.0;
+    string paymentMethodName = "";
+
+    while (paymentChoice != 1 && paymentChoice != 2) {
+        cout << "\nSelect Payment Method:" << endl;
+        cout << " 1. ShopeePay (RM 3.00 Instant Rebate)" << endl;
+        cout << " 2. Cash on Delivery (COD) (+RM 2.00 Handling Fee)" << endl;
+        cout << "Enter choice (1-2): ";
+
+        if (!(cin >> paymentChoice)) {
+            cout << "[ERROR] Invalid input. Enter 1 or 2." << endl;
+            cin.clear();
+            cin.ignore(1000, '\n');
+            continue;
+        }
+
+        if (paymentChoice == 1) {
+            paymentAdjustment = -3.00;
+            paymentMethodName = "ShopeePay (-RM 3.00)";
+            cout << ">> Payment Selected: ShopeePay (RM 3.00 Rebate applied)" << endl;
+        } else if (paymentChoice == 2) {
+            paymentAdjustment = 2.00;
+            paymentMethodName = "Cash on Delivery (+RM 2.00)";
+            cout << ">> Payment Selected: COD (RM 2.00 handling surcharge applied)" << endl;
+        } else {
+            cout << "[ERROR] Invalid option. Please select 1 or 2." << endl;
+        }
+    }
+
+// Final total calculation
+    double grandTotal = subtotal + shippingFee - voucherDiscount + paymentAdjustment;
+    if (grandTotal < 0.0) {
+        grandTotal = 0.0;
+    }
+
+    double totalSavings = voucherDiscount + (5.00 - shippingFee) + (paymentAdjustment < 0 ? (-paymentAdjustment) : 0.0);
+
+    cout << "\nProcessing order..." << endl;
+
+    // Final official invoice
+    cout << "\n==================================================================" << endl;
+    cout << "                     SHOPEE OFFICIAL INVOICE                      " << endl;
+    cout << "==================================================================" << endl;
+    cout << "Purchased Items:" << endl;
+
+    for (const auto& item : cart) {
+        double lineTotal = item.product.price * item.quantity;
+        cout << "  - " << item.quantity << "x " << left << setw(38) << item.product.name
+             << ": RM " << right << setw(7) << lineTotal << endl;
+    }
+
+    cout << "------------------------------------------------------------------" << endl;
+    cout << left << setw(48) << "Subtotal"
+         << ": RM " << right << setw(7) << subtotal << endl;
+    cout << left << setw(48) << ("Shipping Fee (" + shippingRemark + ")")
+         << ": RM " << right << setw(7) << shippingFee << endl;
+    cout << left << setw(48) << ("Voucher Discount [" + promoCode + "]")
+         << ": -RM" << right << setw(6) << voucherDiscount << endl;
+    cout << left << setw(48) << ("Payment Adjustment: " + paymentMethodName)
+         << ": " << (paymentAdjustment < 0 ? "-RM" : " RM")
+         << right << setw(6) << (paymentAdjustment < 0 ? -paymentAdjustment : paymentAdjustment) << endl;
+    cout << "------------------------------------------------------------------" << endl;
+    cout << left << setw(48) << "TOTAL AMOUNT PAYABLE"
+         << ": RM " << right << setw(7) << grandTotal << endl;
+    cout << left << setw(48) << "TOTAL AMOUNT SAVED"
+         << ": RM " << right << setw(7) << totalSavings << endl;
+    cout << "==================================================================" << endl;
+    cout << "Thank you for shopping with Shopee!" << endl;
+
+    // Reset cart and terminate session
+    cart.clear();
+    exit(0);
 }
