@@ -66,7 +66,6 @@ int main() {
     }
     return 0;
 }
-
 Product products[] = {
     {101, "Wireless Bluetooth Earbuds", 45.00, 15, "Electronics & Gadgets"},
     {102, "Fast Charging USB-C Cable", 8.00, 50, "Electronics & Gadgets"},
@@ -84,3 +83,94 @@ Product products[] = {
     {304, "Purple Sweet Potato", 3.60, 26, "Groceries & Essentials"},
     {305, "Vietnam Cavendish Banana 1kg", 4.99, 14, "Groceries & Essentials"}
 };
+// 全局购物车数据
+CartItem cart[50];
+int cartSize = 0;
+double subtotal = 0.0;
+// 显示分类商品菜单
+void showCategoryMenu(string categoryTitle, int startId, int endId) {
+    cout << "\n--------------------------------------------------" << endl;
+    cout << "CATEGORY: " << categoryTitle << endl;
+    cout << "--------------------------------------------------" << endl;
+    cout << left << setw(7) << "ID" 
+         << setw(31) << "Item Name" 
+         << setw(12) << "Price (RM)" 
+         << "Stock" << endl;
+    
+    for (int i = 0; i < 6; i++) {
+        if (products[i].id >= startId && products[i].id <= endId) {
+            cout << left << setw(7) << products[i].id 
+                 << setw(31) << products[i].name 
+                 << right << setw(6) << fixed << setprecision(2) << products[i].price 
+                 << "        " << products[i].stock << endl;
+        }
+    }
+    cout << "--------------------------------------------------" << endl;
+}
+// 添加商品到购物车逻辑
+void handlePurchase(int startId, int endId, string categoryName, string shortCatName) {
+    int itemId, qty;
+    cout << "Enter Item ID to purchase: ";
+    cin >> itemId;
+    
+    int index = -1;
+    for (int i = 0; i < 6; i++) {
+        if (products[i].id == itemId) {
+            index = i;
+            break;
+        }
+    }
+    
+    if (index != -1 && products[index].id >= startId && products[index].id <= endId) {
+        cout << "Enter Quantity: ";
+        cin >> qty;
+        
+        if (qty > 0 && qty <= products[index].stock) {
+            cart[cartSize].category = products[index].category;
+            cart[cartSize].name = products[index].name;
+            cart[cartSize].price = products[index].price;
+            cart[cartSize].qty = qty;
+            cartSize++;
+            
+            subtotal += (products[index].price * qty);
+            products[index].stock -= qty;
+            
+            cout << ">> Success: Added " << qty << "x " << products[index].name << " to cart.\n";
+        } else {
+            cout << ">> Error: Invalid quantity or insufficient stock.\n";
+        }
+    } else {
+        cout << ">> Error: Invalid Item ID.\n";
+    }
+    
+    int actionChoice;
+    cout << "\nAction: [1] Return to Main Menu  [2] Shop More in " << shortCatName << endl;
+    cout << "Enter choice: ";
+    cin >> actionChoice;
+    
+    if (actionChoice == 2) {
+        showCategoryMenu(categoryName, startId, endId);
+        handlePurchase(startId, endId, categoryName, shortCatName);
+    }
+}
+
+// Review cart, apply promo codes, choose payment method, and render invoice
+void viewCartAndCheckout() {
+    if (cart.empty()) {
+        cout << "\n[NOTICE] Your cart is empty. Add products before checking out." << endl;
+        return;
+    }
+
+    double subtotal = 0.0;
+
+    cout << "\n==================================================" << endl;
+    cout << "                 CHECKOUT SUMMARY                 " << endl;
+    cout << "==================================================" << endl;
+    cout << "Items in Cart:" << endl;
+
+    for (const auto& item : cart) {
+        double lineTotal = item.product.price * item.quantity;
+        subtotal += lineTotal;
+        cout << " - " << item.quantity << "x " << left << setw(32) << item.product.name
+             << ": RM " << right << setw(7) << lineTotal << endl;
+    }}
