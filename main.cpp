@@ -21,7 +21,7 @@ struct CartItem {
 };
 
 // Global cart vector
-vector cart;
+vector<CartItem> cart;
 
 // Function declarations
 void displayCategoryCatalog(const string& categoryName);
@@ -30,7 +30,7 @@ bool viewCartAndCheckout(); // 返回 bool，决定是否退出程序
 int findProductIndexById(int id);
 
 // Inventory data
-vector inventory = {
+vector<Product> inventory = {
     // Electronics & Gadgets
     {101, "Wireless Bluetooth Earbuds", "Electronics & Gadgets", 45.00, 15},
     {102, "Fast Charging USB-C Cable", "Electronics & Gadgets", 8.00, 50},
@@ -105,7 +105,7 @@ int main() {
 int findProductIndexById(int id) {
     for (size_t i = 0; i < inventory.size(); ++i) {
         if (inventory[i].id == id) {
-            return static_cast(i);
+            return static_cast<int>(i);
         }
     }
     return -1;
@@ -255,6 +255,7 @@ bool viewCartAndCheckout() {
     double voucherDiscount = 0.0;
     cout << "\nEnter Promo Code (e.g., SHOPEE10, FREESHIP, or NONE): ";
     cin >> promoCode;
+    cin.ignore(1000, '\n');
 
     if (promoCode == "SHOPEE10") {
         voucherDiscount = subtotal * 0.10;
@@ -280,7 +281,7 @@ bool viewCartAndCheckout() {
     double paymentAdjustment = 0.0;
     string paymentMethodName = "";
 
-    while (paymentChoice != 1 && paymentChoice != 2) {
+    while (true) {
         cout << "\nSelect Payment Method:" << endl;
         cout << " 1. ShopeePay (RM 3.00 Instant Rebate)" << endl;
         cout << " 2. Cash on Delivery (COD) (+RM 2.00 Handling Fee)" << endl;
@@ -292,15 +293,18 @@ bool viewCartAndCheckout() {
             cin.ignore(1000, '\n');
             continue;
         }
+        cin.ignore(1000, '\n'); // Flush buffer
 
         if (paymentChoice == 1) {
             paymentAdjustment = -3.00;
             paymentMethodName = "ShopeePay (-RM 3.00)";
             cout << ">> Payment Selected: ShopeePay (RM 3.00 Rebate applied)" << endl;
+            break; // Exit loop cleanly
         } else if (paymentChoice == 2) {
             paymentAdjustment = 2.00;
             paymentMethodName = "Cash on Delivery (+RM 2.00)";
             cout << ">> Payment Selected: COD (RM 2.00 handling surcharge applied)" << endl;
+            break; // Exit loop cleanly
         } else {
             cout << "[ERROR] Invalid option. Please select 1 or 2." << endl;
         }
