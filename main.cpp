@@ -53,9 +53,18 @@ vector<Product> inventory = {
     {305, "Cavendish Banana 1kg", "Groceries & Essentials", 4.99, 14}
 };
 
+void clearScreen() {
+    #if defined(_WIN32) || defined(_WIN64)
+        system("cls");
+    #else
+        system("clear");
+    #endif
+}
+
 int main() {
     int mainChoice = 0;
     cout << fixed << setprecision(2);
+    clearScreen();
 
     cout << "==================================================" << endl;
     cout << "                   WELCOME TO SHOPEE              " << endl;
@@ -132,13 +141,22 @@ void displayCategoryCatalog(const string& categoryName) {
 }
 
 void handleShopping(const string& categoryName) {
+    string statusMessage = ""; // Holds errors or success notices
+
     while (true) {
+        clearScreen();
         displayCategoryCatalog(categoryName);
+
+        // Display any pending message right under the table
+        if (!statusMessage.empty()) {
+            cout << statusMessage << endl;
+            statusMessage = ""; // Reset after displaying
+        }
 
         int itemId = 0, quantity = 0;
         cout << "Enter Item ID to purchase: ";
         if (!(cin >> itemId)) {
-            cout << "[ERROR] Invalid input. Item ID must be a number." << endl;
+            statusMessage = "[ERROR] Invalid input. Item ID must be a number.";
             cin.clear();
             cin.ignore(1000, '\n');
             continue;
@@ -146,25 +164,25 @@ void handleShopping(const string& categoryName) {
 
         int index = findProductIndexById(itemId);
         if (index == -1 || inventory[index].category != categoryName) {
-            cout << "[ERROR] Invalid Item ID! Please choose an item listed above." << endl;
+            statusMessage = "[ERROR] Invalid Item ID! Please choose an item listed above.";
             continue;
         }
 
         cout << "Enter Quantity: ";
         if (!(cin >> quantity)) {
-            cout << "[ERROR] Invalid input. Quantity must be a number." << endl;
+            statusMessage = "[ERROR] Invalid input. Quantity must be a number.";
             cin.clear();
             cin.ignore(1000, '\n');
             continue;
         }
 
         if (quantity <= 0) {
-            cout << "[ERROR] Quantity must be at least 1 unit." << endl;
+            statusMessage = "[ERROR] Quantity must be at least 1 unit.";
             continue;
         }
 
         if (quantity > inventory[index].stock) {
-            cout << "[ERROR] Insufficient stock! Only " << inventory[index].stock << " units available." << endl;
+            statusMessage = "[ERROR] Insufficient stock! Only " + to_string(inventory[index].stock) + " units available.";
             continue;
         }
 
@@ -202,6 +220,7 @@ void handleShopping(const string& categoryName) {
 
 // 修改点：返回 bool 类型，告知 main 函数是否需要直接 Exit
 bool viewCartAndCheckout() {
+    clearScreen();
     // 核心判定：如果购物车没东西
     if (cart.empty()) {
         cout << "\n==================================================" << endl;
